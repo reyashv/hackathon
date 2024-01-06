@@ -1,0 +1,86 @@
+import json
+import math
+f=open("C:\\Input data\\level2a.json")
+data=json.load(f)
+neighborhoods=[]
+distance=[]
+dict={}
+j=0
+cap=[]
+for i in range(5):
+    cap.append(data['vehicles']['v'+str(i)]['capacity'])
+print(cap)
+for i in data['neighbourhoods']:
+    neighborhoods.append(i)
+    data['neighbourhoods'][i]['distances'].append(data['restaurants']['r0']['neighbourhood_distance'][j])
+    distance.append(data['neighbourhoods'][i]['distances'])
+    dict[i]=data['neighbourhoods'][i]['distances']
+    j+=1
+data['restaurants']['r0']['neighbourhood_distance'].append(0)
+dict['r0']=data['restaurants']['r0']['neighbourhood_distance']
+distance1=[]
+for i in dict:
+    distance1.append(dict[i])
+def solve_tsp_nearest(distances):
+    numRest = len(distances)
+    visited = [False] * numRest
+    tour = []
+    currentnumRest = 0
+    tour.append('n'+str(currentnumRest))
+    visited[currentnumRest] = True  
+    while len(tour) < numRest:
+        nearest_rest = None
+        nearest_distance = math.inf
+        for restt in range(numRest):
+            if not visited[restt]:
+                distance = distances[currentnumRest][restt]
+                if distance < nearest_distance:
+                    nearest_rest = restt
+                    nearest_distance = distance
+        currentnumRest = nearest_rest
+        tour.append('n'+str(currentnumRest))
+        visited[currentnumRest] = True
+    tour.append('r'+str(0))
+    tour.insert(0,'r'+str(0))
+    tour.remove('n20')
+    a=cost(tour)
+    return a 
+
+paths=[]
+def cost(path):
+    path.remove('r0')
+    path.remove('r0')
+    quantity=0
+    tour=[]
+    manyroutes=[]
+    for j in cap:
+        paths=[]
+        for i in path:
+            quantity+=data['neighbourhoods'][i]['order_quantity']
+            if quantity<=j:
+                tour.append(i)
+                if i==path[-1]:
+                    paths.append(tour)
+            else:
+                paths.append(tour)
+                tour=[i]
+                quantity=0
+                quantity+=data['neighbourhoods'][i]['order_quantity'] 
+        #print(paths)
+        manyroutes.append(paths)
+    return manyroutes
+            
+path={}
+shortest={}
+routes={}
+tour= solve_tsp_nearest(distance1)
+for i in range(len(tour)):
+    for j in tour[i]:
+        j.append('r0')
+        j.insert(0,'r0')
+        routes['path'+str(i+1)]=j
+    shortest[list(data['vehicles'].keys())[i]]=routes
+print(shortest)
+with open("C:\\Validators\\level2a\\level2a_output.json",'w') as p:
+    json.dump(shortest,p)
+f.close()
