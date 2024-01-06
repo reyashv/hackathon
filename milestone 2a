@@ -76,9 +76,10 @@ routes={}
 tour= solve_tsp_nearest(distance1)
 for i in range(len(tour)):
     for j in tour[i]:
-        j.append('r0')
-        j.insert(0,'r0')
-        routes['path'+str(i+1)]=j
+        if j[0]!="r0":
+            j.append('r0')
+            j.insert(0,'r0')
+            routes['path'+str(i+1)]=j
     shortest[list(data['vehicles'].keys())[i]]=routes
 print(shortest)
 with open("C:\\Validators\\level2a\\level2a_output.json",'w') as p:
