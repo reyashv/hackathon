@@ -1,0 +1,68 @@
+import json
+import math
+f=open("C:\\Input data\\level0.json")
+data=json.load(f)
+neighborhoods=[]
+distance=[]
+dict={}
+#print(dict)
+j=0
+for i in data['neighbourhoods']:
+    neighborhoods.append(i)
+    data['neighbourhoods'][i]['distances'].append(data['restaurants']['r0']['neighbourhood_distance'][j])
+    distance.append(data['neighbourhoods'][i]['distances'])
+    dict[i]=data['neighbourhoods'][i]['distances']
+    j+=1
+data['restaurants']['r0']['neighbourhood_distance'].append(0)
+dict['r0']=data['restaurants']['r0']['neighbourhood_distance']
+print(dict)
+distance1=[]
+for i in dict:
+    distance1.append(dict[i])
+route=['r0']
+dist=0
+for i in distance1:
+    for j in i:
+        if i.index(j) in route:
+            continue
+        route.append(distance1.index(i))
+        dist+=j
+        break
+def solve_tsp_nearest(distances):
+    numRest = len(distances)
+    visited = [False] * numRest
+    #print(data['vehicles'][''])
+    tour = []
+    currentnumRest = 0
+    tour.append('n'+str(currentnumRest))
+    visited[currentnumRest] = True    
+    while len(tour) < numRest:
+        nearest_rest = None
+        nearest_distance = math.inf
+        for restt in range(numRest):
+            if not visited[restt]:
+                distance = distances[currentnumRest][restt]
+                if distance < nearest_distance:
+                    nearest_rest = restt
+                    nearest_distance = distance
+        currentnumRest = nearest_rest       
+        tour.append('n'+str(currentnumRest))
+        visited[currentnumRest] = True
+    tour.append('r'+str(0))
+    return tour
+path={}
+shortest={}
+tour= solve_tsp_nearest(distance1)
+path['path']=tour
+shortest[list(data['vehicles'].keys())[0]]=path
+print(shortest)
+with open("C:\\Validators\\level0\level0_output.json",'w') as p:
+    json.dump(shortest,p)
+
+f.close()
+print()
+
+'''g=open("C:\Validators\level0\\level0_output.json")
+data=json.load(g)
+print(data)
+g.close()'''
